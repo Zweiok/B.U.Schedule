@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Розклад кабінету"/>
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Розклад групи"/>
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Розклад викладача"/>
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Налаштування"
+            android:icon="@android:drawable/ic_menu_manage"/>
+    </group>
+
+
+</menu>

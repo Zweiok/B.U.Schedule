@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">B.U.Schedule</string>
+    <string name="title_activity_choose_role">activity_choose_role</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity__choose__role">activity__choose__role</string>
+    <string name="title_activity_start_page">start_page</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string-array name="screen_array">
+        <item>Screen 1</item>
+        <item>Screen 2</item>
+        <item>Screen 3</item>
+    </string-array>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+</resources>
