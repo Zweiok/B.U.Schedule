@@ -1,27 +1,35 @@
 {
   "project_info": {
-    "project_number": "788749713278",
-    "firebase_url": "https://buschedule000.firebaseio.com",
-    "project_id": "buschedule000",
-    "storage_bucket": "buschedule000.appspot.com"
+    "project_number": "1084464698603",
+    "firebase_url": "https://buschedule00-b307b.firebaseio.com",
+    "project_id": "buschedule00-b307b",
+    "storage_bucket": "buschedule00-b307b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:788749713278:android:a948e0b656cf024b",
+        "mobilesdk_app_id": "1:1084464698603:android:a948e0b656cf024b",
         "android_client_info": {
           "package_name": "com.example.adminto.buschedule"
         }
       },
       "oauth_client": [
         {
-          "client_id": "788749713278-ihb3m7o3tlko5rifgvbnfhereod96k90.apps.googleusercontent.com",
+          "client_id": "1084464698603-vhh45m3reuf2ghl71d302rktla14m5e7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.adminto.buschedule",
+            "certificate_hash": "964dfbf1e0f167b4a8074a855e39ea09d95237f3"
+          }
+        },
+        {
+          "client_id": "1084464698603-k0tjkuh3gh58gfd216cs0fqvcee5v4j6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCM225fFaztT2Ytg6OB0S1acD9MmsT8qvo"
+          "current_key": "AIzaSyAB4aZ6nc49_0R-rDZlemCFeLr6voSxOkI"
         }
       ],
       "services": {
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084464698603-k0tjkuh3gh58gfd216cs0fqvcee5v4j6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

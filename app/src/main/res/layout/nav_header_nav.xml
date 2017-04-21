@@ -27,7 +27,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textAlignment="center"
         android:gravity="center_vertical"
-        android:layout_weight="0.30"
-        android:background="?android:attr/actionModeBackground" />
+        android:layout_weight="0.30" />
 
 </LinearLayout>

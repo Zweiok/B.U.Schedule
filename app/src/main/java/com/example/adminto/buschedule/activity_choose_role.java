@@ -14,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.TextView;
-
 public class activity_choose_role extends AppCompatActivity {
 
     /**
@@ -36,7 +34,7 @@ public class activity_choose_role extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity__choose__role);
+        setContentView(R.layout.activity_choose_role);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
         // Create the adapter that will return a fragment for each of the three
@@ -57,7 +55,6 @@ public class activity_choose_role extends AppCompatActivity {
         Intent intObj = new Intent(this, start_page.class);
         startActivity(intObj);
     }
-
 
 
 

@@ -30,7 +30,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:onClick="openSchedule"
-        />
+        android:minHeight="55dp" />
 
     <EditText
         android:layout_width="wrap_content"
