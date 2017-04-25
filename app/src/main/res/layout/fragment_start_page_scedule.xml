@@ -15,5 +15,5 @@
         android:layout_height="match_parent"
         android:id="@+id/expListView"
         android:divider="?android:attr/actionBarDivider"
-        android:groupIndicator="?android:attr/selectableItemBackgroundBorderless" />
+        android:groupIndicator="@android:drawable/screen_background_dark_transparent" />
 </LinearLayout>

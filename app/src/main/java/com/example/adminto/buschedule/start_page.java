@@ -144,10 +144,10 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         static public String[] Time = new String[] { "10:10", "11:50", "13:10", "14:40"};
         static public String[] group = new String[] { "asq-125", "den-643", "uyl-635", "fnz-513" };
 
-        private String[] mWinterMonthsArray = new String[] { "comment 1 ls", "comment 1 ls", "comment 1 ls" };
-        private String[] mSpringMonthsArray = new String[] { "comment 2 ls", "comment 2 ls", "comment 2 ls" };
-        private String[] mSummerMonthsArray = new String[] { "no comments" };
-        private String[] mAutumnMonthsArray = new String[] { "comment 4 ls", "comment 4 ls", "comment 4 ls" };
+        private String[] mWinterMonthsArray = new String[] { "comment 1 ls", "comment 1 ls", "comment 1 ls" , ""};
+        private String[] mSpringMonthsArray = new String[] { "comment 2 ls", "comment 2 ls", "comment 2 ls", "" };
+        private String[] mSummerMonthsArray = new String[] { "no comments" , ""};
+        private String[] mAutumnMonthsArray = new String[] { "comment 4 ls", "comment 4 ls", "comment 4 ls" , ""};
 
 
         View rootView;
@@ -182,7 +182,6 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 children.add(ch[i]);
             }
             groups.add(children);
-
         }
 
 
@@ -270,14 +269,28 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                                      View convertView, ViewGroup parent) {
+                convertView = null;
                 if (convertView == null) {
                     LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    convertView = inflater.inflate(R.layout.support_simple_spinner_dropdown_item, null);
+                    convertView = inflater.inflate(R.layout.comments_activity, null);
+
+                }
+
+                TextView comment = (TextView) convertView.findViewById(R.id.comment);
+                comment.setText(groups.get(groupPosition).get(childPosition));
+
+                if(isLastChild)
+                {
+
+                        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        convertView = inflater.inflate(R.layout.activity_add_comment, null);
+
+
                 }
 
 
-
                 return convertView;
+
             }
 
             @Override
