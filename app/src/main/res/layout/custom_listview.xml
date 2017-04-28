@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -36,9 +37,10 @@
             android:id="@+id/roomNumb"
             android:layout_height="31dp"
             android:layout_alignParentTop="false"
-            android:elevation="0dp"
+            android:elevation="1dp"
             android:singleLine="true"
-            android:layout_gravity="right"/>
+            android:layout_gravity="right"
+            android:textAlignment="center" />
     </LinearLayout>
 
     <FrameLayout
@@ -84,6 +86,24 @@
             android:layout_gravity="center"
             />
 
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="91dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            app:srcCompat="@drawable/ic_action_name1"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:minHeight="22dp"
+            android:maxHeight="2dp" />
     </FrameLayout>
 
 </RelativeLayout>

@@ -391,7 +391,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
         drawer.closeDrawer(GravityCompat.START);
-
+     //   drawer.setDrawerShadow(R.drawable.ic_action_name,GravityCompat.START);
         return true;
     }
 
