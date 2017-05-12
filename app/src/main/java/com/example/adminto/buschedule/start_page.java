@@ -1,7 +1,11 @@
 package com.example.adminto.buschedule;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -13,15 +17,21 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +42,10 @@ import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class start_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -48,7 +60,6 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
 
-
     // названия компаний (групп)
 
     /**
@@ -56,12 +67,14 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
      */
     private ViewPager mViewPager;
     TextView Week;
-    int daysforWeek=0;
+    int daysforWeek = 0;
+    static String startDate = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_page);
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -69,7 +82,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
+        Log.d("Error ", "");
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
@@ -80,9 +93,9 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         Week.setText(getWeek(daysforWeek));
         //________________________________________________________________________________________
     }
+
     //______________________________________________________________________
-    public String getWeek(int week)
-    {
+    public String getWeek(int week) {
 
         Calendar c = GregorianCalendar.getInstance();
 
@@ -91,31 +104,31 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         // Print dates of the current week starting on Monday
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        String startDate = "", endDate = "";
+        String endDate = "";
         c.add(Calendar.DATE, week);
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE, 6);
         endDate = df.format(c.getTime());
 
-        return  " " + startDate + " -\n- " + endDate;
+        return " " + startDate + " -\n- " + endDate;
 
     }
     //{
 
-    public void nextWeek(View v)
-    {
-        daysforWeek+=7;
+    public void nextWeek(View v) {
+
+        daysforWeek += 7;
         Week.setText(getWeek(daysforWeek));
     }
 
-    public void prevWeek(View v)
-    {
-        daysforWeek-=7;
+    public void prevWeek(View v) {
+        daysforWeek -= 7;
         Week.setText(getWeek(daysforWeek));
     }
 
     //}
     //______________________________________________________________________
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -138,16 +151,17 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             fragment.setArguments(args);
             return fragment;
         }
-        static public String[] lessonsName = new String[] { "first lesson name", "second lesson name", "third lesson name", "fourth lesson name" };
-        static public String[] roomNumb = new String[] { "100", "101", "104", "255" };
-        static public String[] TeachersName = new String[] { "Qwerty Qwert1", "Qwerty Qwert1", "Qwerty Qwert1", "Qwerty Qwert1" };
-        static public String[] Time = new String[] { "10:10", "11:50", "13:10", "14:40"};
-        static public String[] group = new String[] { "asq-125", "den-643", "uyl-635", "fnz-513" };
 
-        private String[] mWinterMonthsArray = new String[] { "comment 1 ls", "comment 1 ls", "comment 1 ls" , ""};
-        private String[] mSpringMonthsArray = new String[] { "comment 2 ls", "comment 2 ls", "comment 2 ls", "" };
-        private String[] mSummerMonthsArray = new String[] { "no comments" , ""};
-        private String[] mAutumnMonthsArray = new String[] { "comment 4 ls", "comment 4 ls", "comment 4 ls" , ""};
+        static public String[] lessonsName = new String[]{"first lesson name", "second lesson name", "third lesson name", "fourth lesson name"};
+        static public String[] roomNumb = new String[]{"100", "101", "104", "255"};
+        static public String[] TeachersName = new String[]{"Qwerty Qwert1", "Qwerty Qwert1", "Qwerty Qwert1", "Qwerty Qwert1"};
+        static public String[] Time = new String[]{"04:12", "04:13", "04:14", "04:15"};
+        static public String[] group = new String[]{"asq-125", "den-643", "uyl-635", "fnz-513"};
+
+        private String[] mWinterMonthsArray = new String[]{"comment 1 ls", "comment 1 ls", "comment 1 ls", ""};
+        private String[] mSpringMonthsArray = new String[]{"comment 2 ls", "comment 2 ls", "comment 2 ls", ""};
+        private String[] mSummerMonthsArray = new String[]{"no comments", ""};
+        private String[] mAutumnMonthsArray = new String[]{"comment 4 ls", "comment 4 ls", "comment 4 ls", ""};
 
 
         View rootView;
@@ -174,8 +188,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             return rootView;
         }
 
-        public void addToArrayList(String[] ch)
-        {
+        public void addToArrayList(String[] ch) {
 
             children = new ArrayList<>();
             for (int i = 0; i < ch.length; i++) {
@@ -185,8 +198,6 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         }
 
 
-
-
         //customize extandablelist{
 
         public class ExpListAdapter extends BaseExpandableListAdapter {
@@ -194,7 +205,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             private ArrayList<ArrayList<String>> mGroups;
             private Context mContext;
 
-            public ExpListAdapter (Context context,ArrayList<ArrayList<String>> groups){
+            public ExpListAdapter(Context context, ArrayList<ArrayList<String>> groups) {
                 mContext = context;
                 mGroups = groups;
             }
@@ -243,18 +254,17 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                     convertView = inflater.inflate(R.layout.custom_listview, null);
                 }
 
-                if (isExpanded){
+                if (isExpanded) {
                     //Изменяем что-нибудь, если текущая Group раскрыта
-                }
-                else{
+                } else {
                     //Изменяем что-нибудь, если текущая Group скрыта
                 }
 
-                TextView lessonsName1 = (TextView) convertView.findViewById(R.id.lessonsName) ;
-                TextView roomNumb1 = (TextView) convertView.findViewById(R.id.roomNumb) ;
-                TextView TeachersName1 = (TextView) convertView.findViewById(R.id.TeachersName) ;
-                TextView Time1 = (TextView) convertView.findViewById(R.id.Time) ;
-                TextView group1 = (TextView) convertView.findViewById(R.id.group) ;
+                TextView lessonsName1 = (TextView) convertView.findViewById(R.id.lessonsName);
+                TextView roomNumb1 = (TextView) convertView.findViewById(R.id.roomNumb);
+                TextView TeachersName1 = (TextView) convertView.findViewById(R.id.TeachersName);
+                TextView Time1 = (TextView) convertView.findViewById(R.id.Time);
+                TextView group1 = (TextView) convertView.findViewById(R.id.group);
                 lessonsName1.setText(lessonsName[groupPosition]);
                 roomNumb1.setText(roomNumb[groupPosition] + " каб.");
                 TeachersName1.setText("Викладач: " + TeachersName[groupPosition]);
@@ -279,16 +289,13 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 TextView comment = (TextView) convertView.findViewById(R.id.comment);
                 comment.setText(groups.get(groupPosition).get(childPosition));
 
-                if(isLastChild)
-                {
+                if (isLastChild) {
 
-                        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        convertView = inflater.inflate(R.layout.activity_add_comment, null);
+                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    convertView = inflater.inflate(R.layout.activity_add_comment, null);
 
 
                 }
-
-
                 return convertView;
 
             }
@@ -320,8 +327,9 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1
-        );
-    }
+            );
+        }
+
         @Override
         public int getCount() {
             // Show 7 total pages.
@@ -379,32 +387,64 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        final String[] roomNumb = new String[]{"100", "101", "104", "255"};
+        final String[] TeachersName = new String[]{"Qwerty Qwert", "Qwerty Qwert", "Qwerty Qwert1", "Qwerty Qwert1"};
+        final String[] group = new String[]{"asq-125", "den-643", "uyl-635", "fnz-513"};
+
         if (id == R.id.nav_camera) {
-            NavActivityOnCLick();
+            View view = LayoutInflater.from(getApplication()).inflate(R.layout.choose_sch_room, null);
+            choose("Виберіть кабінет", roomNumb, view);
         } else if (id == R.id.nav_gallery) {
-            NavActivityOnCLick();
+            View view = LayoutInflater.from(getApplication()).inflate(R.layout.choose_sch_group, null);
+            choose("Виберіть групу", group, view);
         } else if (id == R.id.nav_slideshow) {
-            NavActivityOnCLick();
+            View view = LayoutInflater.from(getApplication()).inflate(R.layout.choose_sch_teacher, null);
+            choose("Виберіть викладача", TeachersName, view);
         } else if (id == R.id.nav_settings) {
             OnSettingsChoose();
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_content);
         drawer.closeDrawer(GravityCompat.START);
-     //   drawer.setDrawerShadow(R.drawable.ic_action_name,GravityCompat.START);
         return true;
     }
 
-    public void NavActivityOnCLick()
-    {
-        Toast.makeText(this,"do something",Toast.LENGTH_SHORT).show();
-    }
-
-    public void OnSettingsChoose()
-    {
+    public void OnSettingsChoose() {
         Intent intObj = new Intent(this, settings.class);
         startActivity(intObj);
     }
+    // }
+
+    // alert dialog{
+
+    public void choose(String s, String[] t, View view) {
+
+
+        final ListView listView = (ListView) view.findViewById(R.id.listView);
+
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        listView.setSelector(android.R.color.darker_gray);
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_activated_1, t);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                Toast.makeText(view.getContext(), "" + adapter.getItem(listView.getCheckedItemPosition()), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(view.getRootView());
+        dialog.setTitle(s);
+        dialog.show();
+
+
+    }
+
+
     // }
 
 

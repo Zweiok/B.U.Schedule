@@ -22,11 +22,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="66dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.30"
+        android:gravity="center"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="Name|Group"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textAlignment="center"
-        android:gravity="center_vertical"
-        android:layout_weight="0.30" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 </LinearLayout>

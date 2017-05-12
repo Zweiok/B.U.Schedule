@@ -13,8 +13,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class activity_choose_role extends AppCompatActivity {
+
+    static int role;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -48,21 +51,24 @@ public class activity_choose_role extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+
     }
 
-    public void openSchedule(View v)
-    {
+
+    public void teacher(View v) {
+
+        Intent intObj = new Intent(this, start_page.class);
+        startActivity(intObj);
+    }
+
+    public void student(View v) {
+
         Intent intObj = new Intent(this, start_page.class);
         startActivity(intObj);
     }
 
 
-
-
-
     // sliding form
-
-
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -87,24 +93,58 @@ public class activity_choose_role extends AppCompatActivity {
             fragment.setArguments(args);
             return fragment;
         }
+
         View rootView;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
 
-
-            if (getArguments().getInt(ARG_SECTION_NUMBER)== 1)
-            {
+            if (getArguments().getInt(ARG_SECTION_NUMBER) == 1) {
                 rootView = inflater.inflate(R.layout.student_form, container, false);
+
+                Button student = (Button) rootView.findViewById(R.id.button2);
+                student.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        if (true) {
+                            role = 0;
+                            Intent intObj = new Intent(rootView.getContext(), start_page.class);
+                            startActivity(intObj);
+                        }
+                    }
+                });
+
             }
-            if (getArguments().getInt(ARG_SECTION_NUMBER)== 2)
-            {
+            if (getArguments().getInt(ARG_SECTION_NUMBER) == 2) {
                 rootView = inflater.inflate(R.layout.teacher_form, container, false);
+
+                Button teacher = (Button) rootView.findViewById(R.id.button3);
+
+                teacher.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        if (true) {
+                            role = 1;
+                            Intent intObj = new Intent(rootView.getContext(), start_page.class);
+                            startActivity(intObj);
+                        }
+
+                    }
+                });
+
 
             }
             return rootView;
+
+
         }
+
     }
 
     /**
