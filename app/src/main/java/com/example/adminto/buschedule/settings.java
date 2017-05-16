@@ -59,9 +59,8 @@ public class settings extends AppCompatActivity {
 
                 Toast.makeText(getBaseContext(),"Please wait, connecting to server.",Toast.LENGTH_LONG).show();
 
-                    new PostToWeb().execute("http://www.test1.somee.com/");
-
-
+                    GetParsedFromServer.GetSchedule("КН-10","01-05-2017","30-06-2017");
+                //makeText();
             }
         });
 

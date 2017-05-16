@@ -1,7 +1,10 @@
 package com.example.adminto.buschedule;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 
@@ -10,15 +13,34 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 
 public class activity_choose_role extends AppCompatActivity {
 
     static int role;
-
+    private static Context context;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -33,7 +55,8 @@ public class activity_choose_role extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-
+    static boolean serverIsOnline=false;
+    static DataBase dataBase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,24 +74,19 @@ public class activity_choose_role extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        activity_choose_role.context = getApplicationContext();
 
+        //CheckServerConnection.checkConnection();
+        dataBase = new DataBase(this);
+       // GetParsedFromServer.GetSchedule("КН-10","01-05-2017","30-06-2017");
     }
 
-
-    public void teacher(View v) {
-
-        Intent intObj = new Intent(this, start_page.class);
-        startActivity(intObj);
+    public static void makeToast(String s) {
+        Toast.makeText(activity_choose_role.context, "" + s, Toast.LENGTH_SHORT).show();
     }
-
-    public void student(View v) {
-
-        Intent intObj = new Intent(this, start_page.class);
-        startActivity(intObj);
-    }
-
 
     // sliding form
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -108,7 +126,7 @@ public class activity_choose_role extends AppCompatActivity {
                 student.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        // TODO: 15.05.2017
 
                         if (true) {
                             role = 0;
@@ -127,7 +145,7 @@ public class activity_choose_role extends AppCompatActivity {
                 teacher.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        // TODO: 15.05.2017
 
                         if (true) {
                             role = 1;

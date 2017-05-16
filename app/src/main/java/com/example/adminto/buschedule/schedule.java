@@ -7,20 +7,26 @@ package com.example.adminto.buschedule;
 public class schedule {
     public int id;
     public String time;
+    public String date;
     public String name;
     public String group;
     public String prof;
     public String room;
 
-
-    public schedule(int id, String time, String name, String group, String prof, String room) {
+    public schedule(int id, String time, String date, String name, String group, String prof, String room) {
         this.id = id;
         this.time = time;
+        this.date = date;
         this.name = name;
         this.group = group;
         this.prof = prof;
         this.room = room;
     }
+
+    public schedule() {
+
+    }
+
 
     public int getId() {
         return id;
@@ -36,6 +42,14 @@ public class schedule {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getName() {

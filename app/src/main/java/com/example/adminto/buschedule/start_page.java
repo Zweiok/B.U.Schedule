@@ -4,8 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -26,12 +24,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
-import android.widget.SimpleExpandableListAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,11 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 public class start_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -67,8 +58,8 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
      */
     private ViewPager mViewPager;
     TextView Week;
-    int daysforWeek = 0;
-    static String startDate = "";
+    int daysOfWeek = 0;
+    static String[] Dates = new String[7];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +81,8 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         navigationView.setNavigationItemSelectedListener(this);
         //________________________________________________________________________________________
         Week = (TextView) findViewById(R.id.Week);
-        Week.setText(getWeek(daysforWeek));
+        Week.setText(getWeek(daysOfWeek));
+      //  GetParsedFromServer.GetSchedule("КН-10",Dates[0],Dates[Dates.length-1]);
         //________________________________________________________________________________________
     }
 
@@ -104,27 +96,41 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         // Print dates of the current week starting on Monday
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        String endDate = "";
+/*
         c.add(Calendar.DATE, week);
         startDate = df.format(c.getTime());
         c.add(Calendar.DATE, 6);
         endDate = df.format(c.getTime());
+/*/
+        c.add(Calendar.DATE, week);
+        Dates[0] = df.format(c.getTime());
+        for (int i = 1; i <= 6 ; i++)
+        {
+            c.add(Calendar.DATE, 1);
+            Dates[i] = df.format(c.getTime());
+        }
 
-        return " " + startDate + " -\n- " + endDate;
+
+        return " " + Dates[0] + " -\n- " + Dates[Dates.length-1];
+
+     //   return " " + startDate + " -\n- " + endDate;
 
     }
     //{
 
     public void nextWeek(View v) {
 
-        daysforWeek += 7;
-        Week.setText(getWeek(daysforWeek));
+        daysOfWeek += 7;
+        Week.setText(getWeek(daysOfWeek));
+     //   GetParsedFromServer.GetSchedule("КН-10",Dates[0],Dates[Dates.length-1]);
     }
 
     public void prevWeek(View v) {
-        daysforWeek -= 7;
-        Week.setText(getWeek(daysforWeek));
+        daysOfWeek -= 7;
+        Week.setText(getWeek(daysOfWeek));
+      //  GetParsedFromServer.GetSchedule("КН-10",Dates[0],Dates[Dates.length-1]);
     }
+    static ArrayList<schedule> scheduleArrayList = new ArrayList<>();
 
     //}
     //______________________________________________________________________
@@ -137,7 +143,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
          * The fragment argument representing the section number for this
          * fragment.
          */
-
+        static ArrayList<schedule> scheduleOfFragment;
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         /**
@@ -149,6 +155,16 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            /*
+            scheduleOfFragment = new ArrayList<>();
+            for (schedule s: start_page.scheduleArrayList) {
+                if(s.getDate() == start_page.Dates[sectionNumber])
+                {
+                    scheduleOfFragment.add(s);
+                }
+            }
+*/
+
             return fragment;
         }
 
@@ -158,22 +174,26 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         static public String[] Time = new String[]{"04:12", "04:13", "04:14", "04:15"};
         static public String[] group = new String[]{"asq-125", "den-643", "uyl-635", "fnz-513"};
 
+
         private String[] mWinterMonthsArray = new String[]{"comment 1 ls", "comment 1 ls", "comment 1 ls", ""};
         private String[] mSpringMonthsArray = new String[]{"comment 2 ls", "comment 2 ls", "comment 2 ls", ""};
         private String[] mSummerMonthsArray = new String[]{"no comments", ""};
         private String[] mAutumnMonthsArray = new String[]{"comment 4 ls", "comment 4 ls", "comment 4 ls", ""};
 
 
-        View rootView;
+        static View rootView;
 
 
         ArrayList<ArrayList<String>> groups;
         ArrayList<String> children;
-
+         // global schedule arraylist
+        schedule ss;
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_start_page_scedule, container, false);
+
+
 
             //_____________________________________________________________________________________
             groups = new ArrayList<>();
@@ -183,10 +203,37 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             addToArrayList(mAutumnMonthsArray);
             //_____________________________________________________________________________________________________
             ExpandableListView expandableListView = (ExpandableListView) rootView.findViewById(R.id.expListView);
-            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups);
+            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups, addssss());
             expandableListView.setAdapter(adapter);
             return rootView;
         }
+        public ArrayList<schedule> addssss()
+        {
+            scheduleArrayList = new ArrayList<>();
+            for (int i = 0; i < lessonsName.length ; i++) {
+                ss = new schedule();
+                ss.setGroup(group[i]);
+                ss.setId(i);
+                ss.setName(lessonsName[i]);
+                ss.setProf(TeachersName[i]);
+                ss.setTime(Time[i]);
+                ss.setRoom(roomNumb[i]);
+                scheduleArrayList.add(ss);
+
+            }
+            return scheduleArrayList;
+        }
+/*
+        public static void changeSchedule(ArrayList<schedule> Schedule,ArrayList<ArrayList<String>> comments) {
+
+            Schedule = new ArrayList<>();
+
+
+            ExpandableListView expandableListView = (ExpandableListView) rootView.findViewById(R.id.expListView);
+            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), comments,Schedule);
+            expandableListView.setAdapter(adapter);
+        }
+*/
 
         public void addToArrayList(String[] ch) {
 
@@ -200,14 +247,15 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         //customize extandablelist{
 
-        public class ExpListAdapter extends BaseExpandableListAdapter {
+        public static class ExpListAdapter extends BaseExpandableListAdapter {
 
             private ArrayList<ArrayList<String>> mGroups;
             private Context mContext;
-
-            public ExpListAdapter(Context context, ArrayList<ArrayList<String>> groups) {
+            ArrayList<schedule> mScheduleArrayList;
+            public ExpListAdapter(Context context, ArrayList<ArrayList<String>> groups,ArrayList<schedule> scheduleArrayList) {
                 mContext = context;
                 mGroups = groups;
+                mScheduleArrayList = scheduleArrayList;
             }
 
             @Override
@@ -265,12 +313,11 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 TextView TeachersName1 = (TextView) convertView.findViewById(R.id.TeachersName);
                 TextView Time1 = (TextView) convertView.findViewById(R.id.Time);
                 TextView group1 = (TextView) convertView.findViewById(R.id.group);
-                lessonsName1.setText(lessonsName[groupPosition]);
-                roomNumb1.setText(roomNumb[groupPosition] + " каб.");
-                TeachersName1.setText("Викладач: " + TeachersName[groupPosition]);
-                Time1.setText("Час: " + Time[groupPosition]);
-                group1.setText("Група: " + group[groupPosition]);
-
+                lessonsName1.setText(mScheduleArrayList.get(groupPosition).getName());
+                roomNumb1.setText(mScheduleArrayList.get(groupPosition).getRoom() + " каб.");
+                TeachersName1.setText("Викладач: " +  mScheduleArrayList.get(groupPosition).getProf());
+                Time1.setText("Час: " + mScheduleArrayList.get(groupPosition).getTime());
+                group1.setText("Група: " + mScheduleArrayList.get(groupPosition).getGroup());
 
                 return convertView;
 
@@ -287,7 +334,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 }
 
                 TextView comment = (TextView) convertView.findViewById(R.id.comment);
-                comment.setText(groups.get(groupPosition).get(childPosition));
+                comment.setText(mGroups.get(groupPosition).get(childPosition));
 
                 if (isLastChild) {
 
