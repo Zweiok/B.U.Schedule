@@ -73,6 +73,8 @@ class PostToWeb extends AsyncTask<String, String, String> {
             HttpResponse = success;
         } else {
             HttpResponse = null;
+            activity_choose_role.makeToast("Server is offline");
+            GetParsedFromServer.methodName = null;
         }
 
         switch (GetParsedFromServer.methodName)
@@ -81,11 +83,16 @@ class PostToWeb extends AsyncTask<String, String, String> {
             case "CheckConnection":
                 CheckConnection();
                 break;
-            case "GetSchedule":
+            case "GetScheduleForDB":
                // start_page.scheduleArrayList = GetParsedFromServer.GetSchedule1() ;
                // settings.makeText(GetParsedFromServer.GetSchedule1().get(0).getTime());
                 activity_choose_role.dataBase.addSchedule(GetParsedFromServer.GetSchedule1());
-                settings.makeText(activity_choose_role.dataBase.getSchedule(new String[] {"01-05-2017","30-06-2017","02-06-2017"}).get(0).getDate());
+                //
+                break;
+            case "GetScheduleForListView":
+                //
+
+                //settings.makeText(HttpResponse);
                 break;
             case "CheckUser":
                 break;
@@ -96,6 +103,8 @@ class PostToWeb extends AsyncTask<String, String, String> {
             case "AddComment":
                 break;
             case "GetComments":
+                break;
+            default:
                 break;
             // TODO: 14.05.2017
         }

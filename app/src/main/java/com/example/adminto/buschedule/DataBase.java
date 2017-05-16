@@ -124,18 +124,16 @@ public class DataBase extends SQLiteOpenHelper {
         ArrayList<schedule> schedules = new ArrayList<schedule>();
         schedule s;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c;
+       // Cursor c;
         for(int i = 0; i < Dates.length-1;i++) {
 
-            String selectQuery = "SELECT  * FROM " + TABLE_SCHEDULE + " WHERE " + KEY_DATE + " = '" + Dates[i]+ "'" ;
+            String selectQuery = "SELECT * FROM " + TABLE_SCHEDULE + " WHERE " + KEY_DATE + " = '" + Dates[i]+ "'" ;
 
-
-            c = db.rawQuery(selectQuery, null);
+            Cursor c = db.rawQuery(selectQuery, null);
 
             c.moveToFirst();
-
-            if (c.moveToFirst()) {
-                do {
+            if(c.isAfterLast()) {
+                while (c.moveToNext()) {
                     s = new schedule();
                     s.setGroup(c.getString(c.getColumnIndex(KEY_GROUP)));
                     s.setId(c.getInt(c.getColumnIndex(KEY_ID)));
@@ -145,12 +143,13 @@ public class DataBase extends SQLiteOpenHelper {
                     s.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
                     s.setRoom(c.getString(c.getColumnIndex(KEY_ROOM)));
                     schedules.add(s);
-                } while (c.moveToNext());
+                }
             }
-            db.close();
+            c.close();
+
 
         }
-
+        db.close();
         return schedules;
     } // TODO: 13.05.2017
 

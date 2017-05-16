@@ -17,9 +17,13 @@ public class GetParsedFromServer {
 
     static String methodName;
 
-    public static void GetSchedule(String Group, String StartDate, String EndDate) {
+    public static void GetScheduleForDB(String Group, String StartDate, String EndDate) {
         new PostToWeb().execute("GetSchedule", Group, StartDate, EndDate);
-        GetParsedFromServer.methodName = "GetSchedule";
+        GetParsedFromServer.methodName = "GetScheduleForDB";
+    }
+    public static void GetScheduleForListView(String Group, String StartDate, String EndDate) {
+        new PostToWeb().execute("GetSchedule", Group, StartDate, EndDate);
+        GetParsedFromServer.methodName = "GetScheduleForListView";
     }
 
     public static void CheckUser(String Email, String Password) {

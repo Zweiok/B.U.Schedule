@@ -59,8 +59,10 @@ public class settings extends AppCompatActivity {
 
                 Toast.makeText(getBaseContext(),"Please wait, connecting to server.",Toast.LENGTH_LONG).show();
 
-                    GetParsedFromServer.GetSchedule("КН-10","01-05-2017","30-06-2017");
+                   // GetParsedFromServer.GetScheduleForListView("КН-10","01-05-2017","30-06-2017");
+                settings.makeText(activity_choose_role.dataBase.getSchedule(start_page.Dates).get(0).getDate());
                 //makeText();
+                //
             }
         });
 

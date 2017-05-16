@@ -78,7 +78,7 @@ public class activity_choose_role extends AppCompatActivity {
 
         //CheckServerConnection.checkConnection();
         dataBase = new DataBase(this);
-       // GetParsedFromServer.GetSchedule("КН-10","01-05-2017","30-06-2017");
+        GetParsedFromServer.GetScheduleForDB("КН-10","01-05-2017","30-06-2017");
     }
 
     public static void makeToast(String s) {

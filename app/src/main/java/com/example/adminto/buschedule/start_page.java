@@ -203,7 +203,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             addToArrayList(mAutumnMonthsArray);
             //_____________________________________________________________________________________________________
             ExpandableListView expandableListView = (ExpandableListView) rootView.findViewById(R.id.expListView);
-            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups, addssss());
+            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups, activity_choose_role.dataBase.getSchedule(start_page.Dates));
             expandableListView.setAdapter(adapter);
             return rootView;
         }
@@ -260,7 +260,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
             @Override
             public int getGroupCount() {
-                return mGroups.size();
+                return mScheduleArrayList.size();
             }
 
             @Override

@@ -8,59 +8,61 @@
     android:paddingTop="13dp">
 
     <LinearLayout
+        android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="22dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:minHeight="22dp">
 
         <TextView
-            android:text="_______"
+            android:id="@+id/Time"
             android:layout_width="90dp"
             android:layout_height="31dp"
-            android:id="@+id/Time"
-            android:layout_alignParentTop="false"/>
+            android:layout_alignParentTop="false"
+            android:text="_______" />
 
         <TextView
-            android:text="__________"
+            android:id="@+id/group"
             android:layout_width="104dp"
             android:layout_height="match_parent"
-            android:id="@+id/group"
-            android:layout_alignParentRight="false"
             android:layout_alignParentEnd="false"
-            android:layout_alignParentTop="false"/>
+            android:layout_alignParentRight="false"
+            android:layout_alignParentTop="false"
+            android:text="__________" />
 
         <TextView
-            android:text="_______"
-            android:layout_width="match_parent"
             android:id="@+id/roomNumb"
+            android:layout_width="match_parent"
             android:layout_height="31dp"
             android:layout_alignParentTop="false"
+            android:layout_gravity="right"
             android:elevation="1dp"
             android:singleLine="true"
-            android:layout_gravity="right"
-            android:textAlignment="center" />
+            android:text="_______"
+            android:textAlignment="textEnd" />
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="34dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="32dp">
+        android:layout_marginTop="32dp"
+        android:minHeight="34dp">
 
         <TextView
-            android:text="_______________________"
+            android:id="@+id/TeachersName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/TeachersName"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/roomNumb"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:text="_______________________"
+            android:textSize="12sp" />
     </FrameLayout>
 
     <FrameLayout
