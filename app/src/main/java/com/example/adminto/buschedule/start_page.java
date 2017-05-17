@@ -39,7 +39,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class start_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    public static Context context;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -48,33 +48,32 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
+    private static SectionsPagerAdapter mSectionsPagerAdapter;
 
     // названия компаний (групп)
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private static ViewPager mViewPager;
     TextView Week;
     int daysOfWeek = 0;
     static String[] Dates = new String[7];
-
+    TabLayout tabLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_page);
+        AppContext.setCurrentActivity(this);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
+        context = getApplicationContext();
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        Log.d("Error ", "");
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -82,8 +81,9 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         //________________________________________________________________________________________
         Week = (TextView) findViewById(R.id.Week);
         Week.setText(getWeek(daysOfWeek));
-      //  GetParsedFromServer.GetSchedule("КН-10",Dates[0],Dates[Dates.length-1]);
+        GetParsedFromServer.GetScheduleForListView("КН-10",Dates[0],Dates[Dates.length-1]);
         //________________________________________________________________________________________
+        start_page.scheduleArrayList = activity_choose_role.dataBase.getSchedule(start_page.Dates);
     }
 
     //______________________________________________________________________
@@ -104,7 +104,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 /*/
         c.add(Calendar.DATE, week);
         Dates[0] = df.format(c.getTime());
-        for (int i = 1; i <= 6 ; i++)
+        for (int i = 1; i < 7 ; i++)
         {
             c.add(Calendar.DATE, 1);
             Dates[i] = df.format(c.getTime());
@@ -118,20 +118,35 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
     }
     //{
 
+    public static void updateActivity()
+    {
+/*
+        Intent intent = new Intent(this , mViewPager.getAdapter());
+
+        overridePendingTransition(0, 0);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(intent);*/
+
+
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mSectionsPagerAdapter.notifyDataSetChanged();
+    }
+
     public void nextWeek(View v) {
 
         daysOfWeek += 7;
         Week.setText(getWeek(daysOfWeek));
-     //   GetParsedFromServer.GetSchedule("КН-10",Dates[0],Dates[Dates.length-1]);
+        GetParsedFromServer.GetScheduleForListView("КН-10",Dates[0],Dates[Dates.length-1]);
     }
 
     public void prevWeek(View v) {
         daysOfWeek -= 7;
         Week.setText(getWeek(daysOfWeek));
-      //  GetParsedFromServer.GetSchedule("КН-10",Dates[0],Dates[Dates.length-1]);
+        GetParsedFromServer.GetScheduleForListView("КН-10",Dates[0],Dates[Dates.length-1]);
     }
     static ArrayList<schedule> scheduleArrayList = new ArrayList<>();
-
     //}
     //______________________________________________________________________
 
@@ -143,9 +158,8 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
          * The fragment argument representing the section number for this
          * fragment.
          */
-        static ArrayList<schedule> scheduleOfFragment;
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
+        private static final String ARG_SECTION_NUMBER = "section_number";
         /**
          * Returns a new instance of this fragment for the given section
          * number.
@@ -155,15 +169,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
-            /*
-            scheduleOfFragment = new ArrayList<>();
-            for (schedule s: start_page.scheduleArrayList) {
-                if(s.getDate() == start_page.Dates[sectionNumber])
-                {
-                    scheduleOfFragment.add(s);
-                }
-            }
-*/
+
 
             return fragment;
         }
@@ -186,14 +192,20 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         ArrayList<ArrayList<String>> groups;
         ArrayList<String> children;
-         // global schedule arraylist
-        schedule ss;
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
             rootView = inflater.inflate(R.layout.fragment_start_page_scedule, container, false);
+/*
+            for (schedule s: start_page.scheduleArrayList) {
+                if(s.getDate() == start_page.Dates[container.getId()])
+                {
+                    scheduleOfFragment.add(s);
+                }
+            }
 
-
+*/
 
             //_____________________________________________________________________________________
             groups = new ArrayList<>();
@@ -202,38 +214,30 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             addToArrayList(mSummerMonthsArray);
             addToArrayList(mAutumnMonthsArray);
             //_____________________________________________________________________________________________________
-            ExpandableListView expandableListView = (ExpandableListView) rootView.findViewById(R.id.expListView);
-            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups, activity_choose_role.dataBase.getSchedule(start_page.Dates));
-            expandableListView.setAdapter(adapter);
+
+            CurrDateSchedule(start_page.scheduleArrayList,getArguments().getInt(ARG_SECTION_NUMBER));
             return rootView;
         }
-        public ArrayList<schedule> addssss()
+
+
+        public void CurrDateSchedule(ArrayList<schedule> schedules,int section)
         {
-            scheduleArrayList = new ArrayList<>();
-            for (int i = 0; i < lessonsName.length ; i++) {
-                ss = new schedule();
-                ss.setGroup(group[i]);
-                ss.setId(i);
-                ss.setName(lessonsName[i]);
-                ss.setProf(TeachersName[i]);
-                ss.setTime(Time[i]);
-                ss.setRoom(roomNumb[i]);
-                scheduleArrayList.add(ss);
+            ArrayList<schedule> currDateSchedule = new ArrayList<>();
 
+            for (schedule s: schedules) {
+                if(s.getDate().equals(start_page.Dates[section-1]))
+                {
+                    currDateSchedule.add(s);
+                }
             }
-            return scheduleArrayList;
-        }
-/*
-        public static void changeSchedule(ArrayList<schedule> Schedule,ArrayList<ArrayList<String>> comments) {
-
-            Schedule = new ArrayList<>();
 
 
             ExpandableListView expandableListView = (ExpandableListView) rootView.findViewById(R.id.expListView);
-            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), comments,Schedule);
+            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups, currDateSchedule);
             expandableListView.setAdapter(adapter);
+
         }
-*/
+
 
         public void addToArrayList(String[] ch) {
 
@@ -307,13 +311,12 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 } else {
                     //Изменяем что-нибудь, если текущая Group скрыта
                 }
-
                 TextView lessonsName1 = (TextView) convertView.findViewById(R.id.lessonsName);
                 TextView roomNumb1 = (TextView) convertView.findViewById(R.id.roomNumb);
                 TextView TeachersName1 = (TextView) convertView.findViewById(R.id.TeachersName);
                 TextView Time1 = (TextView) convertView.findViewById(R.id.Time);
                 TextView group1 = (TextView) convertView.findViewById(R.id.group);
-                lessonsName1.setText(mScheduleArrayList.get(groupPosition).getName());
+                lessonsName1.setText(mScheduleArrayList.get(groupPosition).getDate());
                 roomNumb1.setText(mScheduleArrayList.get(groupPosition).getRoom() + " каб.");
                 TeachersName1.setText("Викладач: " +  mScheduleArrayList.get(groupPosition).getProf());
                 Time1.setText("Час: " + mScheduleArrayList.get(groupPosition).getTime());
@@ -375,6 +378,8 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             // Return a PlaceholderFragment (defined as a static inner class below).
             return PlaceholderFragment.newInstance(position + 1
             );
+
+
         }
 
         @Override
@@ -390,6 +395,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             switch (position) {
                 case 0:
                     c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
                     return dateFormat.format(c.getTime());
                 case 1:
                     c.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);

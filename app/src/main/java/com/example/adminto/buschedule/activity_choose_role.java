@@ -1,5 +1,8 @@
 package com.example.adminto.buschedule;
 
+import android.app.Application;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -40,7 +43,7 @@ import java.net.UnknownHostException;
 public class activity_choose_role extends AppCompatActivity {
 
     static int role;
-    private static Context context;
+    public static Context context;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -49,8 +52,9 @@ public class activity_choose_role extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
 
+
+    private SectionsPagerAdapter mSectionsPagerAdapter;
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -61,6 +65,7 @@ public class activity_choose_role extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_role);
+        AppContext.setCurrentActivity(this);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
 
         // Create the adapter that will return a fragment for each of the three
@@ -76,10 +81,10 @@ public class activity_choose_role extends AppCompatActivity {
 
         activity_choose_role.context = getApplicationContext();
 
-        //CheckServerConnection.checkConnection();
         dataBase = new DataBase(this);
         GetParsedFromServer.GetScheduleForDB("КН-10","01-05-2017","30-06-2017");
     }
+
 
     public static void makeToast(String s) {
         Toast.makeText(activity_choose_role.context, "" + s, Toast.LENGTH_SHORT).show();

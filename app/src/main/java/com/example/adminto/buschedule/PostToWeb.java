@@ -1,9 +1,13 @@
 package com.example.adminto.buschedule;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Vibrator;
+import android.view.View;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpVersion;
@@ -26,7 +30,17 @@ import java.util.List;
 
 class PostToWeb extends AsyncTask<String, String, String> {
 
+    private ProgressDialog dialog;
     static String HttpResponse;
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        dialog = new ProgressDialog(AppContext.currentActivity());
+        dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
+        dialog.show();
+
+    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -69,14 +83,13 @@ class PostToWeb extends AsyncTask<String, String, String> {
     protected void onPostExecute(String success) {
         if (success != null) {
             activity_choose_role.serverIsOnline = true;
-
             HttpResponse = success;
         } else {
             HttpResponse = null;
             activity_choose_role.makeToast("Server is offline");
-            GetParsedFromServer.methodName = null;
+            GetParsedFromServer.methodName = "";
         }
-
+        dialog.dismiss();
         switch (GetParsedFromServer.methodName)
         {
             // TODO: 14.05.2017
@@ -90,9 +103,9 @@ class PostToWeb extends AsyncTask<String, String, String> {
                 //
                 break;
             case "GetScheduleForListView":
-                //
-
                 //settings.makeText(HttpResponse);
+                start_page.scheduleArrayList = GetParsedFromServer.GetSchedule1();
+                start_page.updateActivity();
                 break;
             case "CheckUser":
                 break;
@@ -109,6 +122,12 @@ class PostToWeb extends AsyncTask<String, String, String> {
             // TODO: 14.05.2017
         }
         GetParsedFromServer.methodName = null;
+
+    }
+
+    @Override
+    protected void onProgressUpdate(String... values) {
+        super.onProgressUpdate(values);
 
     }
 
