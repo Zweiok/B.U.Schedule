@@ -17,17 +17,9 @@
         <ListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="187dp"
+            android:layout_height="289dp"
             android:choiceMode="singleChoice" />
 
-        <Button
-            android:id="@+id/button8"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentStart="false"
-            android:background="?android:attr/fastScrollTrackDrawable"
-            android:text="Перейти до перегляду" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 
@@ -16,12 +17,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.apache.http.client.ClientProtocolException;
@@ -39,11 +44,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class activity_choose_role extends AppCompatActivity {
 
-    static int role;
     public static Context context;
+    public static user thisUser = new user();
+    static ArrayList<Comment> commentArrayList = new ArrayList<>();
+    static int c = 0;
+    static int schFromList=0;
+    static int count = 0;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -53,16 +63,18 @@ public class activity_choose_role extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
 
-
+    static public String currentSchedulesType; // поточна група\імя\кабінет
     private SectionsPagerAdapter mSectionsPagerAdapter;
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+    static scheduleInfo ScheduleInfo = new scheduleInfo();
     private ViewPager mViewPager;
-    static boolean serverIsOnline=false;
+    static boolean serverIsOnline=true;
     static DataBase dataBase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_role);
         AppContext.setCurrentActivity(this);
@@ -75,14 +87,33 @@ public class activity_choose_role extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
         activity_choose_role.context = getApplicationContext();
-
         dataBase = new DataBase(this);
-        GetParsedFromServer.GetScheduleForDB("КН-10","01-05-2017","30-06-2017");
+        GetParsedFromServer.GetScheduleInfo();
+    }
+    public static void checkUser()
+    {
+        if(dataBase.getUserInfo().getRole() == 3)
+        {
+        }
+        else{
+            thisUser = dataBase.getUserInfo();
+            if(dataBase.getUserInfo().getRole() == 0) {
+                activity_choose_role.currentSchedulesType =activity_choose_role.dataBase.getUserInfo().getGroup_name();
+                gotoSchedule();
+            }
+            else
+            {
+                if(!serverIsOnline)
+                {
+                    gotoSchedule();
+                }
+                activity_choose_role.currentSchedulesType =activity_choose_role.dataBase.getUserInfo().getGroup_name();
+                GetParsedFromServer.CheckUser(dataBase.getUserInfo().getEmail(),dataBase.getUserInfo().getPass());
+            }
+        }
     }
 
 
@@ -91,6 +122,54 @@ public class activity_choose_role extends AppCompatActivity {
     }
 
     // sliding form
+
+    public static void RegStudent(boolean check)
+    {
+
+
+        if(check)
+        {
+
+            thisUser.setRole(0);
+            dataBase.setUserInfo(thisUser);
+            activity_choose_role.currentSchedulesType =activity_choose_role.dataBase.getUserInfo().getGroup_name();
+            gotoSchedule();
+        }
+        else
+        {
+            Toast.makeText(AppContext.getAppContext(), "Невірні дані ", Toast.LENGTH_SHORT).show();
+            thisUser.setGroup_name(null);
+        }
+    }
+    public static void RegTeacher(String[] s)
+    {
+
+        if (s[0].equals("true")) {
+            thisUser.setRole(1);
+            thisUser.setGroup_name(s[1]);
+            dataBase.setUserInfo(thisUser);
+            activity_choose_role.currentSchedulesType =activity_choose_role.dataBase.getUserInfo().getGroup_name();
+            gotoSchedule();
+        }
+        else
+        {
+            Toast.makeText(AppContext.getAppContext(), "" +  s[1] , Toast.LENGTH_SHORT).show();
+            thisUser.setRole(0);
+            thisUser.setPass(null);
+            thisUser.setEmail(null);
+            thisUser.setGroup_name(null);
+        }
+    }
+
+
+    public static void gotoSchedule()
+    {
+
+        Intent intObj = new Intent(AppContext.currentActivity(), start_page.class);
+        AppContext.currentActivity().startActivity(intObj);
+
+    }
+
 
     /**
      * A placeholder fragment containing a simple view.
@@ -117,7 +196,9 @@ public class activity_choose_role extends AppCompatActivity {
             return fragment;
         }
 
-        View rootView;
+        static View rootView;
+
+
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -127,16 +208,18 @@ public class activity_choose_role extends AppCompatActivity {
             if (getArguments().getInt(ARG_SECTION_NUMBER) == 1) {
                 rootView = inflater.inflate(R.layout.student_form, container, false);
 
+                final EditText group = (EditText) rootView.findViewById(R.id.editText2);
+
+
                 Button student = (Button) rootView.findViewById(R.id.button2);
                 student.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: 15.05.2017
-
+                        dataBase.deleteUserInfo();
                         if (true) {
-                            role = 0;
-                            Intent intObj = new Intent(rootView.getContext(), start_page.class);
-                            startActivity(intObj);
+                            activity_choose_role.thisUser.setGroup_name(group.getText().toString());
+                            GetParsedFromServer.RegisterStudent(group.getText().toString(),"sashaLalka");
+
                         }
                     }
                 });
@@ -144,18 +227,20 @@ public class activity_choose_role extends AppCompatActivity {
             }
             if (getArguments().getInt(ARG_SECTION_NUMBER) == 2) {
                 rootView = inflater.inflate(R.layout.teacher_form, container, false);
-
+                final EditText email = (EditText) rootView.findViewById(R.id.editText3);
+                final EditText pass = (EditText) rootView.findViewById(R.id.editText);
                 Button teacher = (Button) rootView.findViewById(R.id.button3);
 
                 teacher.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: 15.05.2017
-
+                        dataBase.deleteUserInfo();
                         if (true) {
-                            role = 1;
-                            Intent intObj = new Intent(rootView.getContext(), start_page.class);
-                            startActivity(intObj);
+                        //    Toast.makeText(rootView.getContext(), "" + email.getText().toString() + pass.getText().toString() , Toast.LENGTH_SHORT).show();
+                            activity_choose_role.thisUser.setEmail(email.getText().toString());
+                            activity_choose_role.thisUser.setPass(pass.getText().toString());
+                            GetParsedFromServer.RegisterTeacher(email.getText().toString(),pass.getText().toString(),"lalkaSasha");
+
                         }
 
                     }
@@ -189,7 +274,6 @@ public class activity_choose_role extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 2;
         }
 

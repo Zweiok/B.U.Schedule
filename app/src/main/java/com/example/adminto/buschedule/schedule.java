@@ -13,16 +13,6 @@ public class schedule {
     public String prof;
     public String room;
 
-    public schedule(int id, String time, String date, String name, String group, String prof, String room) {
-        this.id = id;
-        this.time = time;
-        this.date = date;
-        this.name = name;
-        this.group = group;
-        this.prof = prof;
-        this.room = room;
-    }
-
     public schedule() {
 
     }

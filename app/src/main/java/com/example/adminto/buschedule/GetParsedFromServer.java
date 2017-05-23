@@ -18,33 +18,45 @@ public class GetParsedFromServer {
     static String methodName;
 
     public static void GetScheduleForDB(String Group, String StartDate, String EndDate) {
-        new PostToWeb().execute("GetSchedule", Group, StartDate, EndDate);
         GetParsedFromServer.methodName = "GetScheduleForDB";
+        new PostToWeb().execute("GetSchedule", Group, StartDate, EndDate);
+
     }
     public static void GetScheduleForListView(String Group, String StartDate, String EndDate) {
-        new PostToWeb().execute("GetSchedule", Group, StartDate, EndDate);
         GetParsedFromServer.methodName = "GetScheduleForListView";
+        new PostToWeb().execute("GetSchedule", Group, StartDate, EndDate);
+
     }
 
     public static void CheckUser(String Email, String Password) {
-        new PostToWeb().execute("Check", Email, Password);
         GetParsedFromServer.methodName = "CheckUser";
+        new PostToWeb().execute("Check", Email, Password);
+
     }
 
     public static void RegisterStudent(String Group, String Id) {
-        new PostToWeb().execute("Register", "Student", Group, Id);
         GetParsedFromServer.methodName = "RegisterStudent";
+        new PostToWeb().execute("Register", "Student", Group, Id);
     }
 
     public static void RegisterTeacher(String Email, String Password, String Id) {
-        new PostToWeb().execute("Register", "Prof", Email, Password, Id);
         GetParsedFromServer.methodName = "RegisterTeacher";
+        new PostToWeb().execute("Register", "Prof", Email, Password, Id);
     }
 
     public static void AddComment(String LessonId, String Message, String Name) {
-        new PostToWeb().execute("AddComment", LessonId, Message, Name);
         GetParsedFromServer.methodName = "AddComment";
+        new PostToWeb().execute("AddComment", LessonId, Message, Name);
     }
+    public static void GetComment(String Group, String StartDate, String EndDate) {
+        GetParsedFromServer.methodName = "GetComments";
+        new PostToWeb().execute("GetComments", Group, StartDate, EndDate);
+    }
+    public static void GetScheduleInfo() {
+        GetParsedFromServer.methodName = "GetScheduleInfo";
+        new PostToWeb().execute("GetGRL");
+    }
+
 
     // {id} {time} {name} {group} {prof] {room}
     public static ArrayList<schedule> GetSchedule1() {
@@ -65,17 +77,8 @@ public class GetParsedFromServer {
 
 
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-/*
-                    schedulee = new schedule(
-                            Integer.parseInt(jsonObject.optString("id").toString()),
-                            jsonObject.optString("time").toString(),
-                            jsonObject.optString("name").toString(),
-                            jsonObject.optString("group").toString(),
-                            jsonObject.optString("prof").toString(),
-                            jsonObject.optString("room").toString()
-                    );
 
-     */             String[] DateTime= jsonObject.optString("time").toString().split(" ");
+                    String[] DateTime= jsonObject.optString("time").toString().split(" ");
 
                     String[] t = DateTime[1].split(":");
                     String time = t[0]+":" + t[1];
@@ -103,27 +106,19 @@ public class GetParsedFromServer {
         }
     }
 
-    public static String CheckUser1() {
-        if (activity_choose_role.serverIsOnline) {
-            return PostToWeb.HttpResponse;
-
-        } else {
-            activity_choose_role.makeToast("Server is offline");
-            return null;
-        }
-    }
-
-    public static String[] RegisterStudent1() {
-        String[] s = null;
+    public static boolean CheckUser1() {
+        boolean s = false;
         if (activity_choose_role.serverIsOnline) {
             try {
                 // Create the root JSONObject from the JSON string.
                 // JSONObject jsonRootObject = new JSONObject();
 
                 //Get the instance of JSONArray that contains JSONObjects
-                JSONArray jsonArray = new JSONArray(PostToWeb.HttpResponse);
 
-                
+                JSONObject jsonObject = new JSONObject(PostToWeb.HttpResponse);
+                if(jsonObject.optString("State").toString().equals("true")) {
+                    s = true;
+                }
 
 
             }catch (JSONException e) {
@@ -134,21 +129,51 @@ public class GetParsedFromServer {
             activity_choose_role.makeToast("Server is offline");
         }
         return s;
-    } // TODO: 15.05.2017  
+    }
+
+    public static boolean RegisterStudent1() {
+        boolean s = false;
+        if (activity_choose_role.serverIsOnline) {
+            try {
+                // Create the root JSONObject from the JSON string.
+                // JSONObject jsonRootObject = new JSONObject();
+
+                //Get the instance of JSONArray that contains JSONObjects
+
+                JSONObject jsonObject = new JSONObject(PostToWeb.HttpResponse);
+                if(jsonObject.optString("State").toString().equals("true")) {
+                  s = true;
+                }
+
+
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            activity_choose_role.makeToast("Server is offline");
+        }
+        return s;
+    }
 
     // {State} {ProfName}
     public static String[] RegisterTeacher1() {
-        String[] s = null;
+        String[] s = {"",""};
         if (activity_choose_role.serverIsOnline) {
             try {
                 // Create the root JSONObject from the JSON string.
                 // JSONObject jsonRootObject = new JSONObject();
 
                 //Get the instance of JSONArray that contains JSONObjects
-                JSONArray jsonArray = new JSONArray(PostToWeb.HttpResponse);
+              //  JSONArray jsonArray = new JSONArray(PostToWeb.HttpResponse);
+                JSONObject jsonObject = new JSONObject(PostToWeb.HttpResponse);
 
+                s[0]= jsonObject.optString("State");
+                s[1]= jsonObject.optString("Info");
 
-
+                if(jsonObject.optString("State").toString().equals("true")) {
+                    s[1]= jsonObject.optString("ProfName");
+                }
 
             }catch (JSONException e) {
                 e.printStackTrace();
@@ -158,35 +183,110 @@ public class GetParsedFromServer {
             activity_choose_role.makeToast("Server is offline");
         }
         return s;
-    } // TODO: 15.05.2017
-
-    public static boolean AddComment1() {
-        boolean check = false;
-        String s = "false";
-        if (activity_choose_role.serverIsOnline) {
-            if(PostToWeb.HttpResponse != s)
-            {
-                check = true;
-            }
-        } else {
-            activity_choose_role.makeToast("Server is offline");
-        }
-        return check;
     }
 
-// TODO: 13.05.2017
-    /*
-    public static void GetComments(String LessonId, String Message, String Name)
+
+
+    public static ArrayList<Comment> GetComment1()
     {
-        if(activity_choose_role.serverIsOnline) {
-            PostToWeb postToWeb = new PostToWeb();
-            postToWeb.execute("AddComment",LessonId,Message,Name);
+        ArrayList<Comment> comments = new ArrayList<>(); 
+        Comment comment;
+
+
+        if (activity_choose_role.serverIsOnline) {
+
+
+            try {
+                // Create the root JSONObject from the JSON string.
+                // JSONObject jsonRootObject = new JSONObject();
+
+                //Get the instance of JSONArray that contains JSONObjects
+                JSONArray jsonArray = new JSONArray(PostToWeb.HttpResponse);
+
+                //Iterate the jsonArray and print the info of JSONObjects
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    comment = new Comment();
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    if(jsonObject.length() > 0) {
+                        comment.setName(jsonObject.optString("Name").toString());
+                        comment.setLessonId(Integer.parseInt(jsonObject.optString("LessonId").toString()));
+                        comment.setMessage(jsonObject.optString("Commentary").toString());
+                    }
+                    comments.add(comment);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         else
         {
             activity_choose_role.makeToast("Server is offline");
         }
-
+        
+        return comments;
     }
-*/
+
+    public static scheduleInfo ScheduleInfo()
+    {
+        scheduleInfo S = new scheduleInfo();
+        ArrayList<String> arrayGroup = new ArrayList<>();
+        ArrayList<String> arrayName = new ArrayList<>();
+        ArrayList<String> arrayRoom = new ArrayList<>();
+        if (activity_choose_role.serverIsOnline) {
+
+            try {
+                // Create the root JSONObject from the JSON string.
+                // JSONObject jsonRootObject = new JSONObject();
+
+                //Get the instance of JSONArray that contains JSONObjects
+                JSONArray jsonArray = new JSONArray(PostToWeb.HttpResponse);
+
+                //Iterate the jsonArray and print the info of JSONObjects
+                for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONArray JsonArray = jsonArray.getJSONArray(i);
+
+                    for(int k = 0; k < JsonArray.length(); k++)
+                    {
+                        JSONObject jsonObject = JsonArray.getJSONObject(k);
+
+                        if(i == 0) {
+                            arrayGroup.add(jsonObject.optString("Name").toString());
+                        }
+
+                        if(i == 1) {
+
+                            arrayRoom.add(jsonObject.optString("Name").toString());
+                        }
+                        if(i == 2) {
+
+                            arrayName.add(jsonObject.optString("Name").toString());
+                        }
+
+
+                    }
+
+
+                }
+
+                S.setGroups(arrayGroup);
+                S.setRoom(arrayRoom);
+                S.setTeachersNames(arrayName);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }}
+        else {
+            activity_choose_role.makeToast("Server is offline");
+            return S;
+            }
+
+
+
+
+        return S;
+    }
+
 }

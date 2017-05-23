@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.support.design.internal.NavigationMenuPresenter;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -21,21 +22,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 public class start_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,15 +66,19 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+
     private static ViewPager mViewPager;
     TextView Week;
     int daysOfWeek = 0;
     static String[] Dates = new String[7];
     TabLayout tabLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_page);
+
+
         AppContext.setCurrentActivity(this);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         // Create the adapter that will return a fragment for each of the three
@@ -78,12 +93,33 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.Name_Group);
+
+        nav_user.setText(activity_choose_role.dataBase.getUserInfo().getGroup_name());
+
+
+
+
         //________________________________________________________________________________________
         Week = (TextView) findViewById(R.id.Week);
         Week.setText(getWeek(daysOfWeek));
-        GetParsedFromServer.GetScheduleForListView("КН-10",Dates[0],Dates[Dates.length-1]);
+        GetParsedFromServer.GetScheduleForListView(activity_choose_role.currentSchedulesType,Dates[0],Dates[Dates.length-1]);
         //________________________________________________________________________________________
         start_page.scheduleArrayList = activity_choose_role.dataBase.getSchedule(start_page.Dates);
+        activity_choose_role.commentArrayList = activity_choose_role.dataBase.getComment();
+        if(activity_choose_role.schFromList == 1)
+        {
+            activity_choose_role.schFromList = 0;
+            updateActivity();
+        }
+    }
+
+    static public void refresh()
+    {
+        Intent intObj = new Intent(AppContext.currentActivity(), start_page.class);
+        AppContext.currentActivity().startActivity(intObj);
     }
 
     //______________________________________________________________________
@@ -96,12 +132,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         // Print dates of the current week starting on Monday
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-/*
-        c.add(Calendar.DATE, week);
-        startDate = df.format(c.getTime());
-        c.add(Calendar.DATE, 6);
-        endDate = df.format(c.getTime());
-/*/
+
         c.add(Calendar.DATE, week);
         Dates[0] = df.format(c.getTime());
         for (int i = 1; i < 7 ; i++)
@@ -113,42 +144,78 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         return " " + Dates[0] + " -\n- " + Dates[Dates.length-1];
 
-     //   return " " + startDate + " -\n- " + endDate;
 
     }
     //{
 
     public static void updateActivity()
     {
-/*
-        Intent intent = new Intent(this , mViewPager.getAdapter());
+        Calendar c = GregorianCalendar.getInstance();
 
-        overridePendingTransition(0, 0);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        finish();
-        overridePendingTransition(0, 0);
-        startActivity(intent);*/
+        // Set the calendar to monday of the current week
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        // Print dates of the current week starting on Monday
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
 
+        c.add(Calendar.DATE, -7);
+        String sd = df.format(c.getTime());
+        c.add(Calendar.DATE, 67);
+        String ed = df.format(c.getTime());
+
+        if(activity_choose_role.count == 0)
+        {
+            if(activity_choose_role.serverIsOnline) {
+                activity_choose_role.dataBase.deleteComments();
+                GetParsedFromServer.GetScheduleForDB(activity_choose_role.currentSchedulesType, sd, ed);
+            }
+        }
+        if(activity_choose_role.schFromList == 1) {
+            if(activity_choose_role.serverIsOnline) {
+                start_page.scheduleArrayList = activity_choose_role.dataBase.getSchedule(start_page.Dates);
+                activity_choose_role.schFromList = 0;
+            }
+        }
+        if(activity_choose_role.currentSchedulesType.equals(activity_choose_role.dataBase.getUserInfo().getGroup_name()))
+        {
+            activity_choose_role.commentArrayList = activity_choose_role.dataBase.getComment();
+        }
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mSectionsPagerAdapter.notifyDataSetChanged();
+        activity_choose_role.count++;
     }
 
     public void nextWeek(View v) {
 
         daysOfWeek += 7;
         Week.setText(getWeek(daysOfWeek));
-        GetParsedFromServer.GetScheduleForListView("КН-10",Dates[0],Dates[Dates.length-1]);
+        GetParsedFromServer.GetScheduleForListView(activity_choose_role.currentSchedulesType,Dates[0],Dates[Dates.length-1]);
+        start_page.scheduleArrayList = activity_choose_role.dataBase.getSchedule(start_page.Dates);
+        activity_choose_role.commentArrayList = activity_choose_role.dataBase.getComment();
+        if(!activity_choose_role.serverIsOnline) {
+            updateActivity();
+        }
     }
 
     public void prevWeek(View v) {
         daysOfWeek -= 7;
         Week.setText(getWeek(daysOfWeek));
-        GetParsedFromServer.GetScheduleForListView("КН-10",Dates[0],Dates[Dates.length-1]);
+        GetParsedFromServer.GetScheduleForListView(activity_choose_role.currentSchedulesType,Dates[0],Dates[Dates.length-1]);
+        start_page.scheduleArrayList = activity_choose_role.dataBase.getSchedule(start_page.Dates);
+        activity_choose_role.commentArrayList = activity_choose_role.dataBase.getComment();
+        if(!activity_choose_role.serverIsOnline) {
+            updateActivity();
+        }
     }
     static ArrayList<schedule> scheduleArrayList = new ArrayList<>();
     //}
     //______________________________________________________________________
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -181,10 +248,10 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         static public String[] group = new String[]{"asq-125", "den-643", "uyl-635", "fnz-513"};
 
 
-        private String[] mWinterMonthsArray = new String[]{"comment 1 ls", "comment 1 ls", "comment 1 ls", ""};
-        private String[] mSpringMonthsArray = new String[]{"comment 2 ls", "comment 2 ls", "comment 2 ls", ""};
-        private String[] mSummerMonthsArray = new String[]{"no comments", ""};
-        private String[] mAutumnMonthsArray = new String[]{"comment 4 ls", "comment 4 ls", "comment 4 ls", ""};
+        private String[] mWinterMonthsArray = new String[]{"comment 1 ls", "comment 1 ls", "comment 1 ls" };
+        private String[] mSpringMonthsArray = new String[]{"comment 2 ls", "comment 2 ls", "comment 2 ls" };
+        private String[] mSummerMonthsArray = new String[]{"no comments" };
+        private String[] mAutumnMonthsArray = new String[]{"comment 4 ls", "comment 4 ls", "comment 4 ls" };
 
 
         static View rootView;
@@ -215,14 +282,15 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
             addToArrayList(mAutumnMonthsArray);
             //_____________________________________________________________________________________________________
 
-            CurrDateSchedule(start_page.scheduleArrayList,getArguments().getInt(ARG_SECTION_NUMBER));
+            CurrDateSchedule(start_page.scheduleArrayList,getArguments().getInt(ARG_SECTION_NUMBER),activity_choose_role.commentArrayList);
             return rootView;
         }
 
 
-        public void CurrDateSchedule(ArrayList<schedule> schedules,int section)
+        public void CurrDateSchedule(ArrayList<schedule> schedules,int section,ArrayList<Comment> commentArrayList)
         {
             ArrayList<schedule> currDateSchedule = new ArrayList<>();
+
 
             for (schedule s: schedules) {
                 if(s.getDate().equals(start_page.Dates[section-1]))
@@ -231,9 +299,49 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 }
             }
 
+            ArrayList<ArrayList<Comment>> comments = new ArrayList<>();
+            Comment comment = new Comment();
+
+
+            Collections.sort(currDateSchedule, new Comparator<schedule>() {
+                @Override
+                public int compare(schedule first, schedule second) {
+                    try {
+                        return (new SimpleDateFormat("HH:mm").parse(first.getTime())).compareTo(new SimpleDateFormat("HH:mm").parse(second.getTime()));
+                    } catch (ParseException e) {
+                        return 0;
+                    }
+                }
+            });
+
+
+            for(int q = 0; q < currDateSchedule.size();q++)
+            {
+                comments.add(new ArrayList<Comment>(Arrays.asList(comment)));
+            }
+
+
+
+            for(int i = 0; i < currDateSchedule.size();i++)
+            {
+                //  comments.add(new ArrayList<Comment>(Arrays.asList(comment)));
+                int k = 0;
+                for(int j = 0; j < commentArrayList.size(); j++)
+                {
+                    if(currDateSchedule.get(i).getId() == commentArrayList.get(j).getLessonId())
+                    {
+                        if(k==0) {
+                            comments.get(i).clear();
+                        }
+                        comments.get(i).add(k, commentArrayList.get(j));
+
+                        k++;
+                    }
+                }
+            }
 
             ExpandableListView expandableListView = (ExpandableListView) rootView.findViewById(R.id.expListView);
-            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), groups, currDateSchedule);
+            ExpListAdapter adapter = new ExpListAdapter(rootView.getContext(), comments, currDateSchedule);
             expandableListView.setAdapter(adapter);
 
         }
@@ -253,12 +361,13 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
         public static class ExpListAdapter extends BaseExpandableListAdapter {
 
-            private ArrayList<ArrayList<String>> mGroups;
+            private ArrayList<ArrayList<Comment>> mGroups;
             private Context mContext;
             ArrayList<schedule> mScheduleArrayList;
-            public ExpListAdapter(Context context, ArrayList<ArrayList<String>> groups,ArrayList<schedule> scheduleArrayList) {
+            public ExpListAdapter(Context context, ArrayList<ArrayList<Comment>> groups,ArrayList<schedule> scheduleArrayList) {
                 mContext = context;
-                mGroups = groups;
+                mGroups = new ArrayList<ArrayList<Comment>>(scheduleArrayList.size());
+                mGroups.addAll(groups);
                 mScheduleArrayList = scheduleArrayList;
             }
 
@@ -269,7 +378,15 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
             @Override
             public int getChildrenCount(int groupPosition) {
-                return mGroups.get(groupPosition).size();
+               // if(mGroups.)
+             //   {
+              //      mGroups.set(groupPosition,  new ArrayList<>(Arrays.asList("No Comments", "null")));
+              //  }
+
+                if (activity_choose_role.thisUser.getRole() == 1) {
+                    return mGroups.get(groupPosition).size() + 1;
+                } else return mGroups.get(groupPosition).size();
+
             }
 
             @Override
@@ -316,7 +433,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
                 TextView TeachersName1 = (TextView) convertView.findViewById(R.id.TeachersName);
                 TextView Time1 = (TextView) convertView.findViewById(R.id.Time);
                 TextView group1 = (TextView) convertView.findViewById(R.id.group);
-                lessonsName1.setText(mScheduleArrayList.get(groupPosition).getDate());
+                lessonsName1.setText(mScheduleArrayList.get(groupPosition).getName());
                 roomNumb1.setText(mScheduleArrayList.get(groupPosition).getRoom() + " каб.");
                 TeachersName1.setText("Викладач: " +  mScheduleArrayList.get(groupPosition).getProf());
                 Time1.setText("Час: " + mScheduleArrayList.get(groupPosition).getTime());
@@ -326,26 +443,72 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
             }
 
+
+
             @Override
-            public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
+            public View getChildView(final int groupPosition, int childPosition, boolean isLastChild,
                                      View convertView, ViewGroup parent) {
+
                 convertView = null;
-                if (convertView == null) {
-                    LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    convertView = inflater.inflate(R.layout.comments_activity, null);
+            //    if(childPosition > 0) {
+                    if (convertView == null) {
+                        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        convertView = inflater.inflate(R.layout.comments_activity, null);
 
-                }
+                    }
 
-                TextView comment = (TextView) convertView.findViewById(R.id.comment);
-                comment.setText(mGroups.get(groupPosition).get(childPosition));
+                    TextView comment = (TextView) convertView.findViewById(R.id.comment);
+                    TextView commentName = (TextView) convertView.findViewById(R.id.commentName);
+                    // if(mGroups.get(groupPosition).get(childPosition) != null) {
 
-                if (isLastChild) {
+
+                    //   }
+                    //   else
+                    //   {
+                    ///       comment.setText("No Comments");
+                    //   }
+
+                if (mGroups.get(groupPosition).size() == childPosition) {
 
                     LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     convertView = inflater.inflate(R.layout.activity_add_comment, null);
 
+                    Button addComment = (Button) convertView.findViewById(R.id.addComment);
+                    final EditText note = (EditText) convertView.findViewById(R.id.note);
+
+
+
+                    addComment.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(note.getText().length() != 0) {
+                                if(activity_choose_role.currentSchedulesType.equals(activity_choose_role.dataBase.getUserInfo().getGroup_name())) {
+                                    Comment c = new Comment();
+                                    c.setName(activity_choose_role.dataBase.getUserInfo().getGroup_name());
+                                    c.setMessage(note.getText().toString());
+                                    c.setLessonId(mScheduleArrayList.get(groupPosition).getId());
+                                    activity_choose_role.dataBase.addComments(new ArrayList<Comment>(Arrays.asList(c)));
+                                }
+                                activity_choose_role.makeToast("Замітку додано");
+                                GetParsedFromServer.AddComment(mScheduleArrayList.get(groupPosition).getId()+"",note.getText().toString(),activity_choose_role.dataBase.getUserInfo().getGroup_name());
+
+                                start_page.updateActivity();
+                            }
+                            else
+                            {
+                                activity_choose_role.makeToast("Введіть замітку");
+                            }
+                        }
+                    });
+
 
                 }
+                else
+                {
+                    comment.setText(mGroups.get(groupPosition).get(childPosition).getMessage());
+                    commentName.setText(mGroups.get(groupPosition).get(childPosition).getName());
+                }
+           //     }
                 return convertView;
 
             }
@@ -422,6 +585,7 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
     // Navigation drawer{
 
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -440,19 +604,22 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        final String[] roomNumb = new String[]{"100", "101", "104", "255"};
-        final String[] TeachersName = new String[]{"Qwerty Qwert", "Qwerty Qwert", "Qwerty Qwert1", "Qwerty Qwert1"};
-        final String[] group = new String[]{"asq-125", "den-643", "uyl-635", "fnz-513"};
 
         if (id == R.id.nav_camera) {
             View view = LayoutInflater.from(getApplication()).inflate(R.layout.choose_sch_room, null);
-            choose("Виберіть кабінет", roomNumb, view);
+            if(activity_choose_role.serverIsOnline) {
+            choose("Виберіть кабінет", activity_choose_role.ScheduleInfo.getRoom().toArray(new String[activity_choose_role.ScheduleInfo.getRoom().size()]), view);
+            }else Toast.makeText(context, " Server is offline " , Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_gallery) {
             View view = LayoutInflater.from(getApplication()).inflate(R.layout.choose_sch_group, null);
-            choose("Виберіть групу", group, view);
+            if(activity_choose_role.serverIsOnline) {
+            choose("Виберіть групу", activity_choose_role.ScheduleInfo.getGroups().toArray(new String[activity_choose_role.ScheduleInfo.getGroups().size()]), view);
+            }else Toast.makeText(context, " Server is offline " , Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_slideshow) {
             View view = LayoutInflater.from(getApplication()).inflate(R.layout.choose_sch_teacher, null);
-            choose("Виберіть викладача", TeachersName, view);
+            if(activity_choose_role.serverIsOnline) {
+            choose("Виберіть викладача", activity_choose_role.ScheduleInfo.getTeachersNames().toArray(new String[activity_choose_role.ScheduleInfo.getTeachersNames().size()]), view);
+            }else Toast.makeText(context, " Server is offline " , Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_settings) {
             OnSettingsChoose();
         }
@@ -469,29 +636,33 @@ public class start_page extends AppCompatActivity implements NavigationView.OnNa
 
     // alert dialog{
 
-    public void choose(String s, String[] t, View view) {
-
+    public void choose(String title, String[] list, View view) {
 
         final ListView listView = (ListView) view.findViewById(R.id.listView);
-
+        final Dialog dialog = new Dialog(this);
         listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
         listView.setSelector(android.R.color.darker_gray);
 
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_activated_1, t);
-        listView.setAdapter(adapter);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1, list);
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
                 Toast.makeText(view.getContext(), "" + adapter.getItem(listView.getCheckedItemPosition()), Toast.LENGTH_SHORT).show();
-
+                activity_choose_role.schFromList = 1;
+                activity_choose_role.currentSchedulesType = adapter.getItem(listView.getCheckedItemPosition());
+                refresh();
+                dialog.cancel();
+              //  GetParsedFromServer.GetScheduleForListView(activity_choose_role.currentSchedulesType,start_page.Dates[0],start_page.Dates[start_page.Dates.length-1]);
             }
         });
-        Dialog dialog = new Dialog(this);
+
+
+        listView.setAdapter(adapter);
         dialog.setContentView(view.getRootView());
-        dialog.setTitle(s);
+        dialog.setTitle(title);
         dialog.show();
 
 

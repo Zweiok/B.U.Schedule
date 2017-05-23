@@ -6,40 +6,43 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
+    android:windowSoftInputMode="adjustResize|stateHidden"
     tools:context="com.example.adminto.buschedule.activity_choose_role$PlaceholderFragment">
 
     <TextView
-        android:text="Студент"
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="67dp"
-        android:id="@+id/textView2"
-        android:textSize="34sp"
-        android:layout_alignParentTop="true"
         android:layout_alignLeft="@+id/editText2"
-        android:layout_alignStart="@+id/editText2" />
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="67dp"
+        android:text="Студент"
+        android:textSize="34sp" />
 
     <Button
-        android:text="Далі"
+        android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button2"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:onClick="openSchedule"
-        android:minHeight="55dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:minHeight="55dp"
+        android:text="Далі" />
 
     <EditText
+        android:id="@+id/editText2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/editText2"
-        android:hint="Номер групи"
-        android:layout_marginBottom="100dp"
         android:layout_above="@+id/button2"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:descendantFocusability="beforeDescendants"
+        android:ems="10"
+        android:focusable="true"
+        android:gravity="left"
+        android:hint="Номер групи"
+        android:inputType="text|textCapCharacters|textCapWords|textCapSentences|textAutoComplete" />
+
 </RelativeLayout>

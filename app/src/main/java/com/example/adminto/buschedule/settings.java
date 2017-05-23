@@ -43,28 +43,48 @@ public class settings extends AppCompatActivity {
         alarmSwitcher  = (Switch) findViewById(R.id.AlarmSwitcher);
         Intent intent = new Intent(getApplicationContext() , AlarmService.class);
         pendingIntent = PendingIntent.getBroadcast(settings.this, 0 , intent , PendingIntent.FLAG_UPDATE_CURRENT);
-        textView4 = (TextView) findViewById(R.id.textView4);
+
+        TextView infoRole = (TextView) findViewById(R.id.Role);
+        TextView infoName = (TextView) findViewById(R.id.Group);
+
+        if(activity_choose_role.dataBase.getUserInfo().getRole() == 1)
+        {
+            infoRole.setText("Викладач");
+            infoName.setText("Ім'я: " + activity_choose_role.dataBase.getUserInfo().getGroup_name());
+        }
+        else
+        {
+            infoRole.setText("Студент");
+            infoName.setText("Група: " + activity_choose_role.dataBase.getUserInfo().getGroup_name());
+        }
+
+        Button reset = (Button) findViewById(R.id.Reset);
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                activity_choose_role.dataBase.deleteSchedule();
+                activity_choose_role.dataBase.deleteComments();
+                activity_choose_role.dataBase.deleteUserInfo();
+                /*
+                try {
+                    AlarmManager mgr = (AlarmManager) getSystemService(AppContext.getAppContext().ALARM_SERVICE);
+                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, PendingIntent.getActivity(activity_choose_role.context, 0, new Intent(getIntent()), PendingIntent.FLAG_ONE_SHOT));
+                    System.exit(2);
+                }
+                catch (NullPointerException e)
+                {}
+                */
+            }
+        });
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         final DateFormat dfTime = new java.text.SimpleDateFormat("HH:mm", Locale.getDefault());
         final Calendar c = GregorianCalendar.getInstance();
 
-        Button button7 = (Button) findViewById(R.id.button7);
 
-        button7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                Toast.makeText(getBaseContext(),", connecting to server.",Toast.LENGTH_LONG).show();
-
-                   // GetParsedFromServer.GetScheduleForListView("КН-10","01-05-2017","30-06-2017");
-                settings.makeText(activity_choose_role.dataBase.getSchedule(start_page.Dates).get(0).getDate());
-                //makeText();
-                //
-            }
-        });
 
 
         alarmSwitcher.setOnClickListener(new View.OnClickListener() {

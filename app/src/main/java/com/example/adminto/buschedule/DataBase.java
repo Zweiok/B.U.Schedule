@@ -5,13 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by adminto on 16.02.2017.
@@ -38,12 +35,11 @@ public class DataBase extends SQLiteOpenHelper {
 
     public static final String TABLE_USER_INFO = "_user";
     public static final String KEY_ROLE = "_role";
-    public static final String KEY_READING_SCHEDULE = "_rschedule";
+    public static final String KEY_GROUP_NAME = "_rschedule";
     public static final String KEY_LOG = "_login";
     public static final String KEY_PAS = "_password";
 
 
-    SimpleDateFormat curFormater = new SimpleDateFormat("dd-MM-yyyy");
 
     public DataBase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -61,7 +57,7 @@ public class DataBase extends SQLiteOpenHelper {
                 + KEY_GROUP + " text," + KEY_PROF + " text," + KEY_ROOM + " integer" + ")");
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_USER_INFO + "("
                 + KEY_ID + " INTEGER PRIMARY KEY autoincrement,"
-                + KEY_ROLE + " INTEGER," + KEY_READING_SCHEDULE + " text,"
+                + KEY_ROLE + " INTEGER," + KEY_GROUP_NAME + " text,"
                 + KEY_LOG + " text," + KEY_PAS + " text," + KEY_NAME + " text" + ")");
 
     }
@@ -73,6 +69,21 @@ public class DataBase extends SQLiteOpenHelper {
     }
 
     static SQLiteDatabase db;
+
+    public void deleteUserInfo() {
+        db = getWritableDatabase();
+        db.execSQL("delete from " + TABLE_USER_INFO);
+    }
+
+    public void deleteSchedule() {
+        db = getWritableDatabase();
+        db.execSQL("delete from " + TABLE_SCHEDULE);
+    }
+
+    public void deleteComments() {
+        db = getWritableDatabase();
+        db.execSQL("delete from " + TABLE_COMMENTS);
+    }
 
 
     public void addSchedule(ArrayList<schedule> schedule) {
@@ -97,50 +108,30 @@ public class DataBase extends SQLiteOpenHelper {
 
     }
 
-    public void updateSchedule(ArrayList<schedule> schedule) {
-
-
-        db = this.getWritableDatabase();
-
-        ContentValues cv;
-        for (int i = 0; i < schedule.size(); i++) {
-            cv = new ContentValues();
-
-            cv.put(KEY_TIME, schedule.get(i).getTime());
-            cv.put(KEY_DATE, schedule.get(i).getDate());
-            cv.put(KEY_NAME, schedule.get(i).getName());
-            cv.put(KEY_GROUP, schedule.get(i).getGroup());
-            cv.put(KEY_PROF, schedule.get(i).getProf());
-            cv.put(KEY_ROOM, schedule.get(i).getRoom());
-
-            db.update(TABLE_USER_INFO, cv, KEY_ID + " = ?", new String[]{String.valueOf(schedule.get(i).getId())});
-        }
-        db.close();
-
-    }
-
     public ArrayList<schedule> getSchedule(String[] Dates) {
         ArrayList<schedule> schedules = new ArrayList<schedule>();
         schedule s;
         SQLiteDatabase db = this.getReadableDatabase();
         // Cursor c;
-        for (int i = 0; i < Dates.length ; i++) {
+        for (int i = 0; i < Dates.length; i++) {
 
             String selectQuery = "SELECT * FROM " + TABLE_SCHEDULE + " WHERE " + KEY_DATE + " = '" + Dates[i] + "'";
 
             Cursor c = db.rawQuery(selectQuery, null);
 
             c.moveToFirst();
-            while (c.moveToNext()) {
-                s = new schedule();
-                s.setGroup(c.getString(c.getColumnIndex(KEY_GROUP)));
-                s.setId(c.getInt(c.getColumnIndex(KEY_ID)));
-                s.setName(c.getString(c.getColumnIndex(KEY_NAME)));
-                s.setProf(c.getString(c.getColumnIndex(KEY_PROF)));
-                s.setTime(c.getString(c.getColumnIndex(KEY_TIME)));
-                s.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
-                s.setRoom(c.getString(c.getColumnIndex(KEY_ROOM)));
-                schedules.add(s);
+            if (c.moveToFirst()) {
+                do {
+                    s = new schedule();
+                    s.setGroup(c.getString(c.getColumnIndex(KEY_GROUP)));
+                    s.setId(c.getInt(c.getColumnIndex(KEY_ID)));
+                    s.setName(c.getString(c.getColumnIndex(KEY_NAME)));
+                    s.setProf(c.getString(c.getColumnIndex(KEY_PROF)));
+                    s.setTime(c.getString(c.getColumnIndex(KEY_TIME)));
+                    s.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
+                    s.setRoom(c.getString(c.getColumnIndex(KEY_ROOM)));
+                    schedules.add(s);
+                } while (c.moveToNext());
             }
             c.close();
 
@@ -148,107 +139,90 @@ public class DataBase extends SQLiteOpenHelper {
         }
         db.close();
         return schedules;
-    } // TODO: 13.05.2017
-
-    public void updateRole(int role) {
-
-        String countQuery = "SELECT * FROM " + TABLE_USER_INFO;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
-
-        if (cursor.getCount() > 0) {
-            db = this.getWritableDatabase();
-
-            ContentValues cv = new ContentValues();
-            cv.put(KEY_ROLE, role);
-            db.update(TABLE_USER_INFO, cv, KEY_ID + " = ?", new String[]{String.valueOf(1)});
-            db.close();
-        } else {
-            db = this.getWritableDatabase();
-            ContentValues cv = new ContentValues();
-            cv.put(KEY_ROLE, role);
-            db.insert(TABLE_USER_INFO, null, cv);
-            db.close(); // Closing database connection
-        }
     }
 
-    public void updateLogPass(String Login, String Pass, String Name) {
-        String countQuery = "SELECT * FROM " + TABLE_USER_INFO;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
+    public void setUserInfo(user User) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
-        if (cursor.getCount() > 0) {
-            db = this.getWritableDatabase();
-
-            ContentValues cv = new ContentValues();
-            cv.put(KEY_LOG, Login);
-            cv.put(KEY_PAS, Pass);
-            cv.put(KEY_NAME, Name);
-            db.update(TABLE_USER_INFO, cv, KEY_ID + " = ?", new String[]{String.valueOf(1)});
-            db.close();
-        } else {
-            db = this.getWritableDatabase();
-            ContentValues cv = new ContentValues();
-            cv.put(KEY_LOG, Login);
-            cv.put(KEY_PAS, Pass);
-            cv.put(KEY_NAME, Name);
-            db.insert(TABLE_USER_INFO, null, cv);
-            db.close(); // Closing database connection
-        }
-    }
-
-    public void updateReadingSchedule(String schedule) {
-        String countQuery = "SELECT * FROM " + TABLE_USER_INFO;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
-
-        if (cursor.getCount() > 0) {
-            db = this.getWritableDatabase();
-
-            ContentValues cv = new ContentValues();
-            cv.put(KEY_READING_SCHEDULE, schedule);
-            db.update(TABLE_USER_INFO, cv, KEY_ID + " = ?", new String[]{String.valueOf(1)});
-            db.close();
-        } else {
-            db = this.getWritableDatabase();
-            ContentValues cv = new ContentValues();
-            cv.put(KEY_READING_SCHEDULE, schedule);
-            db.insert(TABLE_USER_INFO, null, cv);
-            db.close(); // Closing database connection
-        }
-
-    }
-
-    public String getReadingSchedule() {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_USER_INFO, new String[]{KEY_READING_SCHEDULE}, KEY_ID + "=?",
-                new String[]{String.valueOf(1)}, null, null, null, null);
-
-
-        return cursor.getString(0);
-    }
-
-    public void addComments(String name, int lid, String comment) {
-        db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(KEY_NAME, name);
-        cv.put(KEY_LID, lid);
-        cv.put(KEY_COMMENT, comment);
-        db.insert(TABLE_COMMENTS, null, cv);
+        cv.put(KEY_LOG, User.getEmail());
+        cv.put(KEY_GROUP_NAME, User.getGroup_name());
+        cv.put(KEY_PAS, User.getPass());
+        cv.put(KEY_ROLE, User.getRole());
+
+
+        db.insert(TABLE_USER_INFO, null, cv);
+    }
+
+    public user getUserInfo() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        user User;
+        String selectQuery = "SELECT * FROM " + TABLE_USER_INFO;
+        User = new user();
+
+        Cursor c = db.rawQuery(selectQuery, null);
+        c.moveToFirst();
+        if (c.isFirst()) {
+            User.setEmail(c.getString(c.getColumnIndex(KEY_LOG)));
+            User.setGroup_name(c.getString(c.getColumnIndex(KEY_GROUP_NAME)));
+            User.setPass(c.getString(c.getColumnIndex(KEY_PAS)));
+            User.setRole(c.getInt(c.getColumnIndex(KEY_ROLE)));
+
+        } else {
+            User.setRole(3);
+        }
+
+        db.close();
+
+        return User;
+    }
+
+    public void addComments(ArrayList<Comment> arrayList) {
+        db = this.getWritableDatabase();
+
+
+        ContentValues cv;
+
+        for ( Comment c : arrayList) {
+            cv = new ContentValues();
+            cv.put(KEY_NAME, c.getName());
+            cv.put(KEY_LID, c.getLessonId());
+            cv.put(KEY_COMMENT, c.getMessage());
+            db.insert(TABLE_COMMENTS, null, cv);
+        }
+
+
+
         db.close(); // Closing database connection
     }
 
-    public ArrayList getComment() {
+    public ArrayList<Comment> getComment() {
+        ArrayList<Comment> arrayComments = new ArrayList<Comment>();
+        Comment com;
         SQLiteDatabase db = this.getReadableDatabase();
+        // Cursor c;
 
-        Cursor cursor = db.query(TABLE_COMMENTS, new String[]{KEY_NAME, KEY_LID, KEY_COMMENT}, KEY_ID + "=?",
-                new String[]{String.valueOf(1)}, null, null, null, null);
-        ArrayList arrayList = new ArrayList();
-        arrayList.addAll((Collection) cursor);
-        return arrayList;
+        String selectQuery = "SELECT * FROM " + TABLE_COMMENTS;
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        c.moveToFirst();
+        if (c.moveToFirst()) {
+            do {
+                com = new Comment();
+
+                com.setMessage(c.getString(c.getColumnIndex(KEY_COMMENT)));
+                com.setLessonId(c.getInt(c.getColumnIndex(KEY_LID)));
+                com.setName(c.getString(c.getColumnIndex(KEY_NAME)));
+
+                arrayComments.add(com);
+            } while (c.moveToNext());
+        }
+        c.close();
+
+
+
+        db.close();
+        return arrayComments;
     }
 }
